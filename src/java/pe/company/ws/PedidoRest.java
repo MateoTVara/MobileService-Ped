@@ -8,6 +8,7 @@ import pe.company.vo.PedidoVo;
 import pe.company.dao.PedidoDao;
 import pe.company.dao.UsuarioDao;
 import pe.company.vo.PedidoClienteInfoVo;
+import pe.company.vo.PedidoDetalladoVo;
 
 @Path("pedido")
 public class PedidoRest {
@@ -87,6 +88,22 @@ public class PedidoRest {
             // Manejar el error
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @Path("/buscarDetallado/{id}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public PedidoDetalladoVo buscarDetalladoPorId(@PathParam("id") int id) {
+        return pedidoDao.findPedidoDetalladoById(id);
+    }
+    
+    @Path("/modificarParcial/{idped}")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response modificarParcial(@PathParam("idped") int idped, PedidoVo pedido) {
+        pedido.setIdped(idped);  // Asignar el idped desde la URL al objeto pedido
+        pedidoDao.updatePartial(pedido);
+        return Response.ok().build();
     }
 
     

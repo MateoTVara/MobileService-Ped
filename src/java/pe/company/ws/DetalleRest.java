@@ -59,11 +59,11 @@ public class DetalleRest {
         return detalleDao.findById(id);
     }
     
-    @Path("/buscarPorPedido/{idped}")
+    @Path("/listarPorPedido/{idped}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<DetalleProductoInfoVo> buscarPorPedido(@PathParam("idped") int idped) {
-        return detalleDao.findByPedidoId(idped);
+    public Collection<DetalleProductoInfoVo> listarDetallesPorPedido(@PathParam("idped") int idped) {
+        return detalleDao.findDetailsByPedidoId(idped);
     }
     
     @Path("/listarNoAsignados")
@@ -92,6 +92,14 @@ public class DetalleRest {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response registrarDetalleParcial(DetalleVo detalle) {
         detalleDao.insertDetalleParcial(detalle);
+        return Response.ok().build();
+    }
+    
+    @Path("/registrarDetalleParcialConIdped")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response registrarDetalleParcialConIdped(DetalleVo detalle) {
+        detalleDao.insertDetalleParcialWithIdped(detalle);
         return Response.ok().build();
     }
 

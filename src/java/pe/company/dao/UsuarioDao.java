@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import pe.company.dbase.ConexionDb;
 
 import pe.company.vo.UsuarioVo;
@@ -128,6 +130,58 @@ public class UsuarioDao
         }
     }
     
+    public Collection<UsuarioVo> findByNombre(String partialNombre) {
+        List<UsuarioVo> resultList = new ArrayList<>();
+
+        try {
+            conn = ConexionDb.MySQL();
+            ps = conn.prepareStatement("SELECT * FROM usuarios WHERE nombre LIKE ?");
+            ps.setString(1, "%" + partialNombre + "%");
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                UsuarioVo usuario = new UsuarioVo();
+                usuario.setIdusu(rs.getInt("idusu"));
+                usuario.setContrasenia(rs.getString("contrasenia"));
+                usuario.setUsuario(rs.getString("usuario"));
+                usuario.setNombre(rs.getString("nombre"));
+
+                resultList.add(usuario);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return resultList;
+    }
+    
+    public UsuarioVo authenticate(String username, String password) {
+        UsuarioVo authenticatedUser = null;
+
+        try {
+            try {
+                conn = ConexionDb.MySQL();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(UsuarioDao.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            ps = conn.prepareStatement("SELECT * FROM usuarios WHERE usuario = ? AND contrasenia = ?");
+            ps.setString(1, username);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                authenticatedUser = new UsuarioVo();
+                authenticatedUser.setIdusu(rs.getInt("idusu"));
+                authenticatedUser.setUsuario(rs.getString("usuario"));
+                authenticatedUser.setContrasenia(rs.getString("contrasenia"));
+                authenticatedUser.setNombre(rs.getString("nombre"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return authenticatedUser;
+    }
     
 }
     

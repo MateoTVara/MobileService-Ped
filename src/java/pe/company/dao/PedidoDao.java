@@ -10,6 +10,7 @@ import java.util.List;
 import pe.company.dbase.ConexionDb;
 import pe.company.vo.ClienteVo;
 import pe.company.vo.PedidoClienteInfoVo;
+import pe.company.vo.PedidoDetalladoVo;
 import pe.company.vo.PedidoVo;
 import pe.company.vo.UsuarioVo;
 
@@ -223,6 +224,59 @@ public class PedidoDao {
         return generatedId;
     }
 
-    
+    public PedidoDetalladoVo findPedidoDetalladoById(int idped) {
+        PedidoDetalladoVo pedidoDetallado = null;
+
+        try {
+            conn = ConexionDb.MySQL();
+            ps = conn.prepareStatement("SELECT p.idped, p.documento, p.fchareparto, " +
+                                       "c.idcli, c.razonsocial, c.rucdni, c.direccion, " +
+                                       "u.idusu, u.nombre " +
+                                       "FROM pedidos p " +
+                                       "JOIN clientes c ON p.idcli = c.idcli " +
+                                       "JOIN usuarios u ON p.idusu = u.idusu " +
+                                       "WHERE p.idped = ?");
+            ps.setInt(1, idped);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                pedidoDetallado = new PedidoDetalladoVo();
+                pedidoDetallado.setIdped(rs.getInt("idped"));
+                pedidoDetallado.setDocumento(rs.getString("documento"));
+                pedidoDetallado.setFchareparto(rs.getString("fchareparto"));
+                pedidoDetallado.setIdcli(rs.getInt("idcli"));
+                pedidoDetallado.setRazonsocial(rs.getString("razonsocial"));
+                pedidoDetallado.setRucdni(rs.getString("rucdni"));
+                pedidoDetallado.setDireccion(rs.getString("direccion"));
+                pedidoDetallado.setIdusu(rs.getInt("idusu"));
+                pedidoDetallado.setNombre(rs.getString("nombre"));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return pedidoDetallado;
+    }
+
+    public void updatePartial(PedidoVo pedido) {
+        try {
+            conn = ConexionDb.MySQL();
+            ps = conn.prepareStatement("UPDATE pedidos SET documento = ?, fchareparto = ?, idusu = ?, idcli = ? WHERE idped = ?");
+
+            ps.setString(1, pedido.getDocumento());
+            ps.setString(2, pedido.getFchareparto());
+            ps.setInt(3, pedido.getIdusu());
+            ps.setInt(4, pedido.getIdcli());
+            ps.setInt(5, pedido.getIdped());
+
+            int rows = ps.executeUpdate();
+            if (rows != 1) {
+                throw new Exception("Error updating pedido with id " + pedido.getIdped());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 
 }

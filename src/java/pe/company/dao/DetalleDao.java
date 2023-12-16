@@ -126,7 +126,7 @@ public class DetalleDao {
         return detalle;
     }
     
-    public List<DetalleProductoInfoVo> findByPedidoId(int idped) {
+    public Collection<DetalleProductoInfoVo> findDetailsByPedidoId(int idped) {
         List<DetalleProductoInfoVo> list = new ArrayList<>();
 
         try {
@@ -215,6 +215,23 @@ public class DetalleDao {
 
             ps.setInt(1, detalle.getIdproduc());
             ps.setInt(2, detalle.getCantidad());
+
+            int rows = ps.executeUpdate();
+            if (rows != 1)
+                throw new Exception("Error al insertar el detalle parcial.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    public void insertDetalleParcialWithIdped(DetalleVo detalle) {
+        try {
+            conn = ConexionDb.MySQL();
+            ps = conn.prepareStatement("INSERT INTO detalles_pedido(idped, idproduc, cantidad) VALUES (?, ?, ?)");
+
+            ps.setInt(1, detalle.getIdped());
+            ps.setInt(2, detalle.getIdproduc());
+            ps.setInt(3, detalle.getCantidad());
 
             int rows = ps.executeUpdate();
             if (rows != 1)

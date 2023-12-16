@@ -15,6 +15,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PUT;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import pe.company.dao.UsuarioDao;
@@ -80,6 +81,26 @@ public class UsuarioRest {
         return Response.ok().build();
     }
     
+    @Path("/buscarPorNombreParcial/{partialNombre}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<UsuarioVo> buscarPorNombreParcial(@PathParam("partialNombre") String partialNombre) {
+        return usuarioDao.findByNombre(partialNombre);
+    }
+    
+    @Path("/autenticar")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response autenticar(@QueryParam("usuario") String usuario, @QueryParam("contrasenia") String contrasenia) {
+        UsuarioVo authenticatedUser = usuarioDao.authenticate(usuario, contrasenia);
+
+        if (authenticatedUser != null) {
+            return Response.ok().entity(authenticatedUser).build();
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
+    }
+
 }
     
    
